@@ -18,10 +18,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+    - uses: oxidize-rb/actions/setup-ruby-and-rust@54cd25fbb69a70a5e80a016e6f6dce4c5f3bf7be
+        with:
+          rustup-toolchain: stable
+          ruby-version: ${{ matrix.ruby }}
+          cache-version: v1
+          bundler-cache: true
+          cargo-cache: true
     - name: Run the default task
       run: bundle exec rake
