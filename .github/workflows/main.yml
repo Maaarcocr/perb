@@ -25,5 +25,7 @@ jobs:
         cache-version: v1
         bundler-cache: true
         cargo-cache: true
+        cargo-cache-extra-path: |
+          ext/perb/target
     - name: Run the default task
       run: bundle exec rake
