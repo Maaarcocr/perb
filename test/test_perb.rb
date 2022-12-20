@@ -8,6 +8,9 @@ class TestPerb < Minitest::Test
   end
 
   def test_it_does_something_useful
-    assert ::Perb.wrapper == "Hello World"
+    result = ::Perb.wrapper do
+      120
+    end
+    assert_equal(result, 120)
   end
 end

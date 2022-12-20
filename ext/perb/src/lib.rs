@@ -1,7 +1,9 @@
 use magnus::{define_module, function};
 
-fn wrapper() -> &'static str {
-    "Hello World"
+fn wrapper() -> magnus::Value {
+    unsafe{
+    rb_sys::rb_yield(0)
+    }
 }
 
 #[magnus::init]

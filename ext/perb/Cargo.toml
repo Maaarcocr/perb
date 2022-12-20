@@ -10,3 +10,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 magnus = "0.4"
+rb-sys = "0.9.52"
