@@ -13,3 +13,5 @@ magnus = { version = "0.4", features = ["rb-sys-interop"] }
 rb-sys = "0.9.52"
 dynasmrt = "1"
 
+[profile.release]
+debug = true

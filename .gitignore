@@ -8,3 +8,5 @@
 /tmp/
 *.bundle
 target/
+perf.data*
+*.so

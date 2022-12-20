@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "perb"
+
+Perb.wrapper do
+  1_000_000_00.times do
+    1 + 2
+  end
+end
