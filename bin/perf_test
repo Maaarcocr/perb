@@ -4,8 +4,23 @@
 require "bundler/setup"
 require "perb"
 
-Perb.wrapper do
-  1_000_000_00.times do
-    1 + 2
+$foo_fn_id = Perb.build_wrapper("foo")
+$bar_fn_id = Perb.build_wrapper("bar")
+
+def bar
+  Perb.wrapper($bar_fn_id) do
+    10_000.times do
+      1 + 2
+    end
   end
 end
+
+def foo_end
+  Perb.wrapper($foo_fn_id) do
+    10_000.times do
+      bar
+    end
+  end
+end
+
+foo

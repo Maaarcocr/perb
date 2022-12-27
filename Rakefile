@@ -13,6 +13,8 @@ task :dev do
   ENV["RB_SYS_CARGO_PROFILE"] = "dev"
 end
 
+ENV["RUSTFLAGS"] = "-C force-frame-pointers=yes"
+
 Rake::TestTask.new(:test) do |t|
   t.deps << :dev << :compile
   t.libs << "test"
