@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
   # needed until rubygems supports Rust support is out of beta
+  spec.add_dependency "parser", "~> 3.1"
   spec.add_dependency "rb_sys", "~> 0.9.39"
 
   # only needed when developing or packaging your gem
@@ -39,4 +40,5 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
+  spec.metadata["rubygems_mfa_required"] = "true"
 end
