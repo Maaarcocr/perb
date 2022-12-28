@@ -9,4 +9,4 @@
 *.bundle
 target/
 perf.data*
-*.so
+lib/perb/*.so
