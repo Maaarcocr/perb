@@ -50,7 +50,7 @@ want to be able to profile. See `bin/perf_test` as an example. Then you can just
 perf record -g <your-ruby-executable>
 ```
 
-and you should be able to profile native and ruby code with one profile.
+and you should be able to profile native and ruby code with one profiler (perf).
 
 ## Caveats
 
