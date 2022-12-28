@@ -1,6 +1,6 @@
 # Perb
 
-Perb instruments your methods such that they show up when a ruby executable gets profiled with perf. it works by
+`perb` automatically instruments your methods such that they show up when a ruby executable gets profiled with perf. it works by
 wrapping all methods with:
 
 ```ruby
