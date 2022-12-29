@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   # needed until rubygems supports Rust support is out of beta
   spec.add_dependency "parser", "~> 3.1"
-  spec.add_dependency "rb_sys", "~> 0.9.39"
+  spec.add_dependency "rb_sys", "~> 0.9.53"
 
   # only needed when developing or packaging your gem
   spec.add_development_dependency "rake-compiler", "~> 1.2.0"
