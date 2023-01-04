@@ -19,7 +19,7 @@ module Perb
       return if block.nil?
 
       insert_before(block.loc.expression, "Perb::wrapper(#{Perb.build_wrapper(method_info)}) do\n")
-      insert_after(block.loc.expression, "\nend")
+      insert_after(node.loc.expression, "\nend")
     end
   end
 end
@@ -35,7 +35,7 @@ module Perb
 
       ast = parser.parse(source)
       source = rewriter.rewrite(source, ast)
-      RubyVM::InstructionSequence.compile(source)
+      RubyVM::InstructionSequence.compile(source, path, path)
     end
   end
 end
