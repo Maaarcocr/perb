@@ -1,46 +1,46 @@
-use std::{io::Write, mem};
+use std::{mem};
 
-use dynasmrt::{dynasm, AssemblyOffset, DynasmApi};
+use cranelift::{prelude::{Signature, FunctionBuilderContext, FunctionBuilder, InstBuilder, settings, Configurable}};
+use cranelift_module::{Module, Linkage};
 use magnus::{define_module, function, rb_sys::FromRawValue};
 
 fn build_wrapper(fn_name: String) -> usize {
-    let mut ops = dynasmrt::x64::Assembler::new().unwrap();
-    let asm_wrapper = ops.offset();
+    let mut builder = settings::builder();
+    builder.enable("unwind_info").unwrap();
+    let flags = settings::Flags::new(builder);
+    let isa = cranelift_native::builder().unwrap().finish(flags).unwrap();
+    let jit_builder = cranelift_jit::JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
+    let mut jit_module = cranelift_jit::JITModule::new(jit_builder);
+    let mut ctx = jit_module.make_context();
 
-    dynasm!(ops
-        ; push rbp
-        ; mov rbp, rsp
-        ; xor rdi, rdi
-        ; mov rax, QWORD rb_sys::rb_yield as _
-        ; call rax
-        ; leave
-        ; ret
-    );
+    ctx.func.signature.returns.push(cranelift::prelude::AbiParam::new(cranelift::prelude::types::I64));
+    let mut fn_builder_ctx = FunctionBuilderContext::new();
+    {
+        let mut builder = FunctionBuilder::new(&mut ctx.func, &mut fn_builder_ctx);
+        let block = builder.create_block();
+        builder.append_block_params_for_function_params(block);
 
-    let end_offset = AssemblyOffset(ops.offset().0 - 1);
+        let mut external_func_sig = Signature::new(cranelift::prelude::isa::CallConv::SystemV);
+        external_func_sig.returns.push(cranelift::prelude::AbiParam::new(cranelift::prelude::types::I64));
+        external_func_sig.params.push(cranelift::prelude::AbiParam::new(cranelift::prelude::types::I64));
+        let sif_ref = builder.import_signature(external_func_sig);
 
-    ops.commit().unwrap();
+        builder.switch_to_block(block);
+        let args = &[builder.ins().iconst(cranelift::prelude::types::I64, 0)];
+        let fn_ptr = builder.ins().iconst(cranelift::prelude::types::I64, rb_sys::rb_yield as usize as i64);
+        let result = builder.ins().call_indirect(
+            sif_ref,
+            fn_ptr,
+            args,
+        );
+        let result = builder.inst_results(result)[0];
+        builder.ins().return_(&[result]);
+    }
 
-    let buf = ops.finalize().unwrap();
-
-    let file_name = format!("/tmp/perf-{}.map", std::process::id());
-    let file = std::fs::OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(file_name)
-        .unwrap();
-    let fn_ptr = buf.ptr(asm_wrapper) as usize;
-    let mut line_writer = std::io::LineWriter::new(file);
-    let len = unsafe { buf.ptr(end_offset).offset_from(buf.ptr(asm_wrapper)) };
-    let perf_map = format!(
-        "{:x} {:x} {}\n",
-        fn_ptr,
-        len,
-        fn_name
-    );
-    line_writer.write_all(perf_map.as_bytes()).unwrap();
-    Box::leak(Box::new(buf));
-    fn_ptr
+    let f_id = jit_module.declare_function(&fn_name, Linkage::Export, &ctx.func.signature).unwrap();
+    jit_module.define_function(f_id, &mut ctx).unwrap();
+    jit_module.finalize_definitions().unwrap();
+    jit_module.get_finalized_function(f_id) as usize
 }
 
 fn wrapper(fn_pointer: usize) -> magnus::Value {
