@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 def bar
-  10_000.times do
+  1_000.times do
     1 + 2
   end
 end
