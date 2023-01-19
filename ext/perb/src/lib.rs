@@ -5,22 +5,29 @@ use cranelift_module::{Module, Linkage};
 use magnus::{define_module, function, rb_sys::FromRawValue};
 
 fn generate_function(mut builder: FunctionBuilder) {
+    // Create a new block.
     let block = builder.create_block();
     builder.append_block_params_for_function_params(block);
 
+    // Create a signature for the external function rb_yield.
     let mut external_func_sig = Signature::new(cranelift::prelude::isa::CallConv::SystemV);
     external_func_sig.returns.push(cranelift::prelude::AbiParam::new(cranelift::prelude::types::I64));
     external_func_sig.params.push(cranelift::prelude::AbiParam::new(cranelift::prelude::types::I64));
     let sif_ref = builder.import_signature(external_func_sig);
 
     builder.switch_to_block(block);
+    // prepare arguments for rb_yield
     let args = &[builder.ins().iconst(cranelift::prelude::types::I64, 0)];
+    // load rb_yield function pointer
     let fn_ptr = builder.ins().iconst(cranelift::prelude::types::I64, rb_sys::rb_yield as usize as i64);
+    // call rb_yield
     let result = builder.ins().call_indirect(
         sif_ref,
         fn_ptr,
         args,
     );
+
+    // return rb_yield result
     let result = builder.inst_results(result)[0];
     builder.ins().return_(&[result]);
 }
