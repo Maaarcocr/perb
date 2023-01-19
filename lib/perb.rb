@@ -57,9 +57,9 @@ module Perb
       method_info = "#{tp.defined_class}::#{tp.method_id} @ #{tp.path}:#{tp.lineno}"
       wrapper = Perb.build_wrapper(method_info)
 
-      tp.defined_class.define_method(tp.method_id) do |*args, &block|
+      tp.defined_class.define_method(tp.method_id) do |*args, **kwargs, &block|
         Perb::wrapper(wrapper) do
-          send(:"#{__method__}_perb", *args, &block)
+          send(:"#{__method__}_perb", *args, **kwargs, &block)
         end
       end
     end
