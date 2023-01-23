@@ -41,38 +41,3 @@ module Perb
     end
   end
 end
-
-module Perb
-  def self.profile(iterations = 10, &block)
-    classes = {}
-    trace = TracePoint.new(:call) do |tp|
-      next if tp.method_id.to_s.include?("_perb")
-
-      classes[tp.defined_class] ||= Set.new
-      next if classes[tp.defined_class].include?(tp.method_id)
-
-      classes[tp.defined_class].add(tp.method_id)
-      tp.defined_class.alias_method(:"#{tp.method_id}_perb", tp.method_id)
-
-      method_info = "#{tp.defined_class}::#{tp.method_id} @ #{tp.path}:#{tp.lineno}"
-      wrapper = Perb.build_wrapper(method_info)
-
-      tp.defined_class.define_method(tp.method_id) do |*args, **kwargs, &block|
-        Perb::wrapper(wrapper) do
-          send(:"#{__method__}_perb", *args, **kwargs, &block)
-        end
-      end
-    end
-
-    trace.enable { iterations.times(&block) }
-
-    for cls in classes.keys
-      for method in classes[cls]
-        cls.alias_method(method, :"#{method}_perb")
-        cls.remove_method(:"#{method}_perb")
-      end
-    end
-  end
-
-  class Error < StandardError; end
-end
