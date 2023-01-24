@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
   # needed until rubygems supports Rust support is out of beta
-  spec.add_dependency "parser", "~> 3.2"
+  spec.add_dependency "syntax_tree", "~> 5.2"
   spec.add_dependency "rb_sys", "~> 0.9.53"
 
   # only needed when developing or packaging your gem
