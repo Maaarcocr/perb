@@ -46,7 +46,14 @@ module Perb
             location: node.bodystmt.location,
           )]
           new_statements = node.bodystmt.statements.copy(body: new_body)
-          new_bodystmt = node.bodystmt.copy(statements: new_statements)
+          new_bodystmt = SyntaxTree::BodyStmt.new(
+            statements: new_statements,
+            rescue_clause: nil,
+            else_keyword: nil,
+            else_clause: nil,
+            ensure_clause: nil,
+            location: node.bodystmt.location,
+          )
           new_node = node.copy(bodystmt: new_bodystmt)
           new_node
         end

@@ -16,6 +16,7 @@ class Test
   end
 
   def foo(x = 1)
+    test_ensure
     10_000.times do
       bar(x)
     end
@@ -27,6 +28,12 @@ class Test
       bar
       baz
     HEREDOC
+  end
+
+  def test_ensure
+    object = 1
+  ensure
+    puts object + 1
   end
 
   def self.too
