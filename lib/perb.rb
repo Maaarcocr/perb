@@ -20,8 +20,8 @@ module Perb
           new_body = [SyntaxTree::MethodAddBlock.new(
             call: SyntaxTree::CallNode.new(
               receiver: SyntaxTree::VarRef.new(
-                value: SyntaxTree::Const.new(
-                  value: "Perb",
+                value: SyntaxTree::TopConstRef.new(
+                  constant: SyntaxTree::Const.new(value: "Perb", location: node.bodystmt.location),
                   location: node.bodystmt.location
                 ),
                 location: node.bodystmt.location
@@ -48,7 +48,6 @@ module Perb
           new_statements = node.bodystmt.statements.copy(body: new_body)
           new_bodystmt = node.bodystmt.copy(statements: new_statements)
           new_node = node.copy(bodystmt: new_bodystmt)
-
           new_node
         end
       end
